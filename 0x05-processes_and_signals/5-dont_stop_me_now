@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Find process and kill
+# Use pgrep to find processes by name
+# '-f' option allows matching against the full command line
+# '4-to_infinity_and_beyond' is the pattern to search for
+# Pipe the output of pgrep to xargs to pass the PIDs to kill
+
+pgrep -f 4-to_infinity_and_beyond | xargs kill
