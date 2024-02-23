@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # This script kills the process started by the command '7-highlander'.
-
 # Use pgrep to find processes by command line
 # '-f' option allows matching against the full command line
 # '7-highlander' is the pattern to search for
