@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# This script isplays the contents of the current directory in list format.
+#  Showing  nly displays the part of the name after the first dash.
+# Get the list of files and directories in the current directory 
+
+list=$(ls)
+for i in $list; do
+  echo "$i" | cut -d '-' -f2
+done
