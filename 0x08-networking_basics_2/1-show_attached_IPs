@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Use ifconfig command to get network interface information
+# Filter out IPv4 addresses
+
+ip addr | grep -oE 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}' | awk '{print $2}'
