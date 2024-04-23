@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Update package list and install Nginx
+sudo apt-get update -y
+sudo apt-get install nginx -y
+
+# Allow Nginx HTTP traffic through firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Create index.html with "Hello World!" content
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+# Add URL rewrite rule to Nginx configuration for 301 redirection
+sudo sed -i '/server_name _;/a rewrite ^/redirect_me/ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+
+# Restart Nginx service
+sudo service nginx restart
