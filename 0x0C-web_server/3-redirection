@@ -1,17 +1,37 @@
 #!/usr/bin/env bash
 
 # Update package list and install Nginx
-sudo apt-get update -y
+echo "Updating package list and installing Nginx..."
+sudo apt-get update -y -qq && \
 sudo apt-get install nginx -y
 
-# Allow Nginx HTTP traffic through firewall
+# Start Nginx service
+echo "Starting Nginx service..."
+sudo service nginx start
+
+# Allow Nginx through firewall
+echo "Allowing Nginx through firewall..."
 sudo ufw allow 'Nginx HTTP'
 
-# Create index.html with "Hello World!" content
-echo "Hello World!" | sudo tee /var/www/html/index.html
+# Set ownership and permissions for website files
+echo "Setting ownership and permissions for website files..."
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
 
-# Add URL rewrite rule to Nginx configuration for 301 redirection
-sudo sed -i '/server_name _;/a rewrite ^/redirect_me/ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+# Backup default index file
+echo "Backing up default index file..."
+sudo cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
 
-# Restart Nginx service
+# Create new index file with "Hello World!" content
+echo "Creating new index file with 'Hello World!' content..."
+echo "Hello World!" | sudo tee /var/www/html/index.nginx-debian.html > /dev/null
+
+# Set up /redirect_me to redirect to a YouTube video
+echo "Setting up /redirect_me to redirect to a YouTube video..."
+sudo sed -i '24i\       rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+
+# Restart Nginx
+echo "Restarting Nginx..."
 sudo service nginx restart
+
+echo "Configuration completed."
