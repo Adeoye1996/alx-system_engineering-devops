@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Configure HAProxy to send traffic to web-01 and web-02 using roundrobin
+
+# Update and upgrade packages
+sudo apt-get update
+sudo apt-get upgrade -y
+
+# Install HAProxy
+sudo apt-get install -y haproxy
+
+# Backup the original HAProxy configuration file
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.original
+
+# Configure HAProxy
+echo "
+listen 3284-lb-01
+    bind 0:80
+    mode http
+    stats enable
+    balance roundrobin
+    option httpclose
+    option forwardfor
+    server 503998-web-01 100.25.117.41 check port 80
+    server 503998-web-02 100.25.220.30 check port 80
+" | sudo tee -a /etc/haproxy/haproxy.cfg
+
+# Restart HAProxy
+sudo service haproxy restart
