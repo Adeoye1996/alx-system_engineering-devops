@@ -1,7 +1,7 @@
 #
 # rules.before
 #
-# Rules that should be run before the ufw command line added rules. Custom
+# Rules that should be run before the ufw command line added rules.
 # rules should be added to one of these chains:
 #   ufw-before-input
 #   ufw-before-output
@@ -13,7 +13,7 @@
 -A PREROUTING -p tcp --dport 8080 -j REDIRECT --to-port 80
 COMMIT
 
-# Don't delete these required lines, otherwise there will be errors
+# # Ensure these necessary lines remain untouched to prevent any potential errors.
 *filter
 :ufw-before-input - [0:0]
 :ufw-before-output - [0:0]
@@ -64,7 +64,7 @@ COMMIT
 # if BROADCAST, RETURN
 -A ufw-not-local -m addrtype --dst-type BROADCAST -j RETURN
 
-# all other non-local packets are dropped
+# # Drop any packets that are not local in origin.
 -A ufw-not-local -m limit --limit 3/min --limit-burst 10 -j ufw-logging-deny
 -A ufw-not-local -j DROP
 
@@ -76,5 +76,5 @@ COMMIT
 # is uncommented)
 -A ufw-before-input -p udp -d 239.255.255.250 --dport 1900 -j ACCEPT
 
-# don't delete the 'COMMIT' line or these rules won't be processed
+# # Ensure that the 'COMMIT' line is not removed, as it is necessary for processing these rules.
 COMMIT
