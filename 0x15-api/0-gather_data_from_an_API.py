@@ -26,11 +26,9 @@ if __name__ == '__main__':
 
                 employee_name = user_data.get('name')
                 tasks = [task for task in todos_data if task.get('userId') == employee_id]
-                completed_tasks = [task for task in tasks if task.get('completed')]
-
-                print(
-                    f'Employee {employee_name} is done with tasks({len(completed_tasks)}/{len(tasks)}):'
-                )
+                 completed_tasks = [task for task in tasks if task.get('completed')]
+                completion_status = f'{len(completed_tasks)}/{len(tasks)}'
+                print(f'Employee {employee_name} is done with tasks({completion_status}):')
 
                 for task in completed_tasks:
                     print(f'\t {task.get("title")}')
