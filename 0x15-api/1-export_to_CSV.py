@@ -1,36 +1,41 @@
 #!/usr/bin/python3
-"""Export API data to CSV"""
-
-import csv
+"""Python script to get data from an API and convert to JSON."""
+import json
 import requests
 import sys
 
-def export_tasks_to_csv(user_id):
-    # Construct user URL
-    url_user = f'https://jsonplaceholder.typicode.com/users/{user_id}'
-    
-    # Fetch user data
-    user_res = requests.get(url_user)
-    user_data = user_res.json()
-    user_name = user_data.get('username')
-    
-    # Fetch tasks data
-    task_res = requests.get(f'{url_user}/todos')
-    tasks = task_res.json()
-    
-    # Write data to CSV
-    with open(f'{user_id}.csv', 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        # Write header
-        csv_writer.writerow(["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
-        # Write tasks
-        for task in tasks:
-            csv_writer.writerow([user_id, user_name, task["completed"], task["title"]])
-
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: python script.py USER_ID")
+        print("Usage: {} <USER_ID>".format(sys.argv[0]))
         sys.exit(1)
-    
-    user_id = sys.argv[1]
-    export_tasks_to_csv(user_id)
+
+    USER_ID = sys.argv[1]
+    url_to_user = f'https://jsonplaceholder.typicode.com/users/{USER_ID}'
+    user_response = requests.get(url_to_user)
+
+    if user_response.status_code != 200:
+        print("Error fetching user data.")
+        sys.exit(1)
+
+    USERNAME = user_response.json().get('username')
+    url_to_tasks = f'{url_to_user}/todos'
+    tasks_response = requests.get(url_to_tasks)
+
+    if tasks_response.status_code != 200:
+        print("Error fetching tasks data.")
+        sys.exit(1)
+
+    tasks = tasks_response.json()
+    dict_data = {USER_ID: []}
+
+    for task in tasks:
+        TASK_COMPLETED_STATUS = task.get('completed')
+        TASK_TITLE = task.get('title')
+        dict_data[USER_ID].append({
+            "task": TASK_TITLE,
+            "completed": TASK_COMPLETED_STATUS,
+            "username": USERNAME
+        })
+
+    with open(f'{USER_ID}.json', 'w') as json_file:
+        json.dump(dict_data, json_file)
