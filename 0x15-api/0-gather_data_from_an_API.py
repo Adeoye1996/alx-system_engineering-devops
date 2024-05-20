@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-let gather the employee data from API
+Let gather the employee data from API
 '''
 
 import requests
@@ -12,19 +12,33 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1].isdigit():
             employee_id = int(sys.argv[1])
-            user_response = requests.get(f'{REST_API}/users/{employee_id}')
-            todos_response = requests.get(f'{REST_API}/todos')
+            user_response = requests.get(
+                f'{REST_API}/users/{employee_id}'
+            )
+            todos_response = requests.get(
+                f'{REST_API}/todos'
+            )
 
-            if user_response.status_code == 200 and todos_response.status_code == 200:
+            if (
+                user_response.status_code == 200 and
+                todos_response.status_code == 200
+            ):
                 user_data = user_response.json()
                 todos_data = todos_response.json()
 
                 employee_name = user_data.get('name')
-                tasks = [task for task in todos_data if task.get('userId') == employee_id]
-                completed_tasks = [task for task in tasks if task.get('completed')]
+                tasks = [
+                    task for task in todos_data
+                    if task.get('userId') == employee_id
+                ]
+                completed_tasks = [
+                    task for task in tasks
+                    if task.get('completed')
+                ]
 
                 print(
-                    f'Employee {employee_name} is done with tasks({len(completed_tasks)}/{len(tasks)}):'
+                    f'Employee {employee_name} is done with tasks('
+                    f'{len(completed_tasks)}/{len(tasks)}):'
                 )
 
                 for task in completed_tasks:
