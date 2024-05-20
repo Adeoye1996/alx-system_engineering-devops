@@ -4,38 +4,46 @@ import json
 import requests
 import sys
 
+
+def fetch_user_data(user_id):
+    url = f'https://jsonplaceholder.typicode.com/users/{user_id}'
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
+
+
+def fetch_tasks(user_id):
+    url = f'https://jsonplaceholder.typicode.com/users/{user_id}/todos'
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
+
+
+def export_to_json(user_id, username, tasks):
+    dict_data = {str(user_id): []}
+    for task in tasks:
+        dict_data[str(user_id)].append({
+            "task": task.get("title"),
+            "completed": task.get("completed"),
+            "username": username
+        })
+    with open(f'{user_id}.json', 'w') as json_file:
+        json.dump(dict_data, json_file)
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: {} <USER_ID>".format(sys.argv[0]))
         sys.exit(1)
 
-    USER_ID = sys.argv[1]
-    url_to_user = f'https://jsonplaceholder.typicode.com/users/{USER_ID}'
-    user_response = requests.get(url_to_user)
+    user_id = sys.argv[1]
 
-    if user_response.status_code != 200:
-        print("Error fetching user data.")
+    try:
+        user_data = fetch_user_data(user_id)
+        tasks = fetch_tasks(user_id)
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
         sys.exit(1)
 
-    USERNAME = user_response.json().get('username')
-    url_to_tasks = f'{url_to_user}/todos'
-    tasks_response = requests.get(url_to_tasks)
-
-    if tasks_response.status_code != 200:
-        print("Error fetching tasks data.")
-        sys.exit(1)
-
-    tasks = tasks_response.json()
-    dict_data = {USER_ID: []}
-
-    for task in tasks:
-        TASK_COMPLETED_STATUS = task.get('completed')
-        TASK_TITLE = task.get('title')
-        dict_data[USER_ID].append({
-            "task": TASK_TITLE,
-            "completed": TASK_COMPLETED_STATUS,
-            "username": USERNAME
-        })
-
-    with open(f'{USER_ID}.json', 'w') as json_file:
-        json.dump(dict_data, json_file)
+    username = user_data.get("username")
+    export_to_json(user_id, username, tasks)
