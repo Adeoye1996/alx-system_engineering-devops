@@ -1,35 +1,8 @@
 #!/usr/bin/python3
-"""Python script to get data from an API and convert to JSON."""
+"""Fetch data from an API and export to a JSON file."""
 import json
 import requests
 import sys
-
-
-def fetch_user_data(user_id):
-    url = f'https://jsonplaceholder.typicode.com/users/{user_id}'
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.json()
-
-
-def fetch_tasks(user_id):
-    url = f'https://jsonplaceholder.typicode.com/users/{user_id}/todos'
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.json()
-
-
-def export_to_json(user_id, username, tasks):
-    dict_data = {str(user_id): []}
-    for task in tasks:
-        dict_data[str(user_id)].append({
-            "task": task.get("title"),
-            "completed": task.get("completed"),
-            "username": username
-        })
-    with open(f'{user_id}.json', 'w') as json_file:
-        json.dump(dict_data, json_file)
-
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
@@ -37,13 +10,32 @@ if __name__ == '__main__':
         sys.exit(1)
 
     user_id = sys.argv[1]
-
-    try:
-        user_data = fetch_user_data(user_id)
-        tasks = fetch_tasks(user_id)
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")
+    url_to_user = f'https://jsonplaceholder.typicode.com/users/{user_id}'
+    
+    user_response = requests.get(url_to_user)
+    if user_response.status_code != 200:
+        print("Error fetching user data.")
         sys.exit(1)
 
-    username = user_data.get("username")
-    export_to_json(user_id, username, tasks)
+    username = user_response.json().get('username')
+    
+    url_to_tasks = f'{url_to_user}/todos'
+    tasks_response = requests.get(url_to_tasks)
+    if tasks_response.status_code != 200:
+        print("Error fetching tasks data.")
+        sys.exit(1)
+
+    tasks = tasks_response.json()
+
+    user_tasks = {user_id: []}
+    for task in tasks:
+        task_completed_status = task.get('completed')
+        task_title = task.get('title')
+        user_tasks[user_id].append({
+            "task": task_title,
+            "completed": task_completed_status,
+            "username": username
+        })
+
+    with open(f'{user_id}.json', 'w') as json_file:
+        json.dump(user_tasks, json_file)
