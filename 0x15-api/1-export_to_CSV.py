@@ -1,41 +1,30 @@
 #!/usr/bin/python3
-"""Fetch data from an API and export to a JSON file."""
+""" Python to get data from an API and convert to Json"""
+import csv
 import json
 import requests
 import sys
 
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: {} <USER_ID>".format(sys.argv[0]))
-        sys.exit(1)
+    USER_ID = sys.argv[1]
+    url_to_user = 'https://jsonplaceholder.typicode.com/users/' + USER_ID
+    res = requests.get(url_to_user)
+    """Documentation"""
+    USERNAME = res.json().get('username')
+    """Documentation"""
+    url_to_task = url_to_user + '/todos'
+    res = requests.get(url_to_task)
+    tasks = res.json()
 
-    user_id = sys.argv[1]
-    url_to_user = f'https://jsonplaceholder.typicode.com/users/{user_id}'
-    
-    user_response = requests.get(url_to_user)
-    if user_response.status_code != 200:
-        print("Error fetching user data.")
-        sys.exit(1)
-
-    username = user_response.json().get('username')
-    
-    url_to_tasks = f'{url_to_user}/todos'
-    tasks_response = requests.get(url_to_tasks)
-    if tasks_response.status_code != 200:
-        print("Error fetching tasks data.")
-        sys.exit(1)
-
-    tasks = tasks_response.json()
-
-    user_tasks = {user_id: []}
+    dict_data = {USER_ID: []}
     for task in tasks:
-        task_completed_status = task.get('completed')
-        task_title = task.get('title')
-        user_tasks[user_id].append({
-            "task": task_title,
-            "completed": task_completed_status,
-            "username": username
-        })
-
-    with open(f'{user_id}.json', 'w') as json_file:
-        json.dump(user_tasks, json_file)
+        TASK_COMPLETED_STATUS = task.get('completed')
+        TASK_TITLE = task.get('title')
+        dict_data[USER_ID].append({
+                                  "task": TASK_TITLE,
+                                  "completed": TASK_COMPLETED_STATUS,
+                                  "username": USERNAME})
+    """print(dict_data)"""
+    with open('{}.json'.format(USER_ID), 'w') as f:
+        json.dump(dict_data, f)
