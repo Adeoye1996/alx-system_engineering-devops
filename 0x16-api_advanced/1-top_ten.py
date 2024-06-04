@@ -15,21 +15,18 @@ def top_ten(subreddit):
     headers = {"User-Agent": "MyAPI/0.0.1"}
     
     try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise an error for bad status codes
-        
-        data = response.json().get('data', {}).get('children', [])
-        if not data:
-            print("None")
+        response = requests.get(url, headers=headers, allow_redirects=False)
+        if response.status_code != 200:
+            print(None)
             return
-        
-        for post in data:
-            print(post.get('data', {}).get('title', 'None'))
-    
-    except requests.RequestException as e:
-        print(f"HTTP Request failed: {e}")
-    except ValueError:
-        print("Invalid JSON response")
+
+        data = response.json().get("data")
+        if data is None:
+            print(None)
+            return
+
+        for post in data.get("children"):
+            print(post.get("data").get("title"))
     except Exception as e:
         print(f"An error occurred: {e}")
 
